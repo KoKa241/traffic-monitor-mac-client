@@ -38,10 +38,16 @@ A native macOS menubar utility for the [Traffic Monitor](https://github.com/KoKa
 ## Installation
 
 ### Option 1: Download Release
-1. Go to the [Releases](#) page.
+1. Go to the [Releases](https://github.com/KoKa241/traffic-monitor-mac-client/releases) page.
 2. Download the latest `TrafficMonitor.app.zip`.
 3. Unzip and drag `TrafficMonitor.app` to your `Applications` folder.
-4. Launch the app and complete the Onboarding wizard.
+4. **Important macOS Gatekeeper Step:** Since the app is not signed with a paid Apple Developer certificate, macOS may block it.
+   - Try to **Right-click** `TrafficMonitor.app` and select **Open**.
+   - If macOS says the app is "damaged", open your Terminal and run this command to remove the quarantine flag:
+     ```bash
+     xattr -cr /Applications/TrafficMonitor.app
+     ```
+5. Launch the app and complete the Onboarding wizard.
 
 ### Option 2: Build from Source
 1. **Clone the repository:**
