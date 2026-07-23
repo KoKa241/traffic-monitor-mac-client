@@ -3,14 +3,50 @@ import Combine
 
 // MARK: - Data Models
 
+struct PingData: Codable {
+    let avg_latency_ms: Double
+    let worst_latency_ms: Double
+    let avg_packet_loss: Double
+    let max_packet_loss: Double
+    let latest_latency_ms: Double
+    let latest_packet_loss: Double
+    let target: String
+    let total_checks: Int
+
+    enum CodingKeys: String, CodingKey {
+        case avg_latency_ms, worst_latency_ms, avg_packet_loss, max_packet_loss
+        case latest_latency_ms, latest_packet_loss, target, total_checks
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+
+        func flex(_ key: CodingKeys) -> Double {
+            if let v = try? c.decode(Double.self, forKey: key) { return v }
+            if let s = try? c.decode(String.self, forKey: key), let v = Double(s) { return v }
+            return 0.0
+        }
+
+        avg_latency_ms    = flex(.avg_latency_ms)
+        worst_latency_ms  = flex(.worst_latency_ms)
+        avg_packet_loss   = flex(.avg_packet_loss)
+        max_packet_loss   = flex(.max_packet_loss)
+        latest_latency_ms = flex(.latest_latency_ms)
+        latest_packet_loss = flex(.latest_packet_loss)
+        target            = (try? c.decode(String.self, forKey: .target)) ?? ""
+        total_checks      = (try? c.decode(Int.self,    forKey: .total_checks)) ?? 0
+    }
+}
+
 struct TrafficData: Codable {
     let day_gb: Double
     let day_limit: Double
     let month_gb: Double
     let month_limit: Double
+    let ping: PingData?
 
     enum CodingKeys: String, CodingKey {
-        case day_gb, day_limit, month_gb, month_limit
+        case day_gb, day_limit, month_gb, month_limit, ping
     }
 
     // Гибкий декодер: принимает и число, и строку
@@ -24,10 +60,11 @@ struct TrafficData: Codable {
             return 0.0
         }
 
-        day_gb    = decodeFlexible(.day_gb)
-        day_limit = decodeFlexible(.day_limit)
-        month_gb  = decodeFlexible(.month_gb)
+        day_gb      = decodeFlexible(.day_gb)
+        day_limit   = decodeFlexible(.day_limit)
+        month_gb    = decodeFlexible(.month_gb)
         month_limit = decodeFlexible(.month_limit)
+        ping        = try? container.decode(PingData.self, forKey: .ping)
     }
 }
 

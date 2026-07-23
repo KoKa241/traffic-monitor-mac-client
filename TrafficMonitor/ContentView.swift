@@ -7,6 +7,7 @@ struct ContentView: View {
     @StateObject private var manager = TrafficManager.shared
     @AppStorage("refreshInterval") private var interval: Double = 60.0
     @AppStorage("showDailyBar") private var showDailyBar: Bool = true
+    @AppStorage("showPingSection") private var showPingSection: Bool = true
 
     var body: some View {
         VStack(spacing: 0) {
@@ -41,6 +42,12 @@ struct ContentView: View {
                             value: data.month_gb,
                             total: data.month_limit
                         )
+
+                        // ── Ping секция ────────────────────────────────────
+                        if showPingSection, let ping = data.ping {
+                            Divider()
+                            PingSection(ping: ping)
+                        }
                     }
                     .padding(.horizontal, 14)
                     .padding(.vertical, 12)
@@ -108,6 +115,89 @@ struct ContentView: View {
 
     private func openSettings() {
         NSApp.sendAction(#selector(AppDelegate.openSettingsWindow), to: nil, from: nil)
+    }
+}
+
+// MARK: - PingSection
+
+struct PingSection: View {
+    let ping: PingData
+
+    @AppStorage("pingShow_avgLatency")    private var showAvgLatency:    Bool = true
+    @AppStorage("pingShow_worstLatency") private var showWorstLatency:  Bool = true
+    @AppStorage("pingShow_latestLatency") private var showLatestLatency: Bool = true
+    @AppStorage("pingShow_avgLoss")      private var showAvgLoss:       Bool = true
+    @AppStorage("pingShow_worstLoss")    private var showWorstLoss:     Bool = true
+    @AppStorage("pingShow_latestLoss")   private var showLatestLoss:    Bool = true
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: "antenna.radiowaves.left.and.right")
+                    .foregroundStyle(.blue)
+                    .font(.caption)
+                Text("Ping – \(ping.target)")
+                    .font(.caption)
+                    .fontWeight(.medium)
+                Spacer()
+                Text("\(ping.total_checks) checks")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+
+            VStack(spacing: 3) {
+                if showAvgLatency {
+                    PingRow(label: "Avg latency",
+                            value: String(format: "%.1f ms", ping.avg_latency_ms),
+                            isWarning: ping.avg_latency_ms > 100)
+                }
+                if showWorstLatency {
+                    PingRow(label: "Worst latency",
+                            value: String(format: "%.1f ms", ping.worst_latency_ms),
+                            isWarning: ping.worst_latency_ms > 150)
+                }
+                if showLatestLatency {
+                    PingRow(label: "Latest latency",
+                            value: String(format: "%.1f ms", ping.latest_latency_ms),
+                            isWarning: ping.latest_latency_ms > 100)
+                }
+                if showAvgLoss {
+                    PingRow(label: "Avg loss",
+                            value: String(format: "%.1f%%", ping.avg_packet_loss),
+                            isWarning: ping.avg_packet_loss > 1)
+                }
+                if showWorstLoss {
+                    PingRow(label: "Worst loss",
+                            value: String(format: "%.1f%%", ping.max_packet_loss),
+                            isWarning: ping.max_packet_loss > 5)
+                }
+                if showLatestLoss {
+                    PingRow(label: "Latest loss",
+                            value: String(format: "%.1f%%", ping.latest_packet_loss),
+                            isWarning: ping.latest_packet_loss > 1)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - PingRow
+
+struct PingRow: View {
+    let label: String
+    let value: String
+    var isWarning: Bool = false
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            Spacer()
+            Text(value)
+                .font(.caption2.monospacedDigit())
+                .foregroundStyle(isWarning ? .orange : .primary)
+        }
     }
 }
 
@@ -354,9 +444,17 @@ struct ServerSettingsTab: View {
 // MARK: - General Tab
 
 struct GeneralSettingsTab: View {
-    @AppStorage("refreshInterval") private var interval: Double = 60.0
-    @AppStorage("showDailyBar")     private var showDailyBar: Bool = true
-    @AppStorage("showPercentInBar") private var showPercentInBar: Bool = true
+    @AppStorage("refreshInterval")  private var interval:         Double = 60.0
+    @AppStorage("showDailyBar")     private var showDailyBar:     Bool   = true
+    @AppStorage("showPercentInBar") private var showPercentInBar: Bool   = true
+    @AppStorage("showPingSection")  private var showPingSection:  Bool   = true
+
+    @AppStorage("pingShow_avgLatency")    private var pingAvgLatency:    Bool = true
+    @AppStorage("pingShow_worstLatency")  private var pingWorstLatency:  Bool = true
+    @AppStorage("pingShow_latestLatency") private var pingLatestLatency: Bool = true
+    @AppStorage("pingShow_avgLoss")       private var pingAvgLoss:       Bool = true
+    @AppStorage("pingShow_worstLoss")     private var pingWorstLoss:     Bool = true
+    @AppStorage("pingShow_latestLoss")    private var pingLatestLoss:    Bool = true
 
     private var intervalLabel: String {
         let mins = interval / 60
@@ -398,7 +496,7 @@ struct GeneralSettingsTab: View {
                 // ── Display Options ──────────────────────────────────────
                 SettingsSection(title: "Display", icon: "eye") {
                     VStack(spacing: 0) {
-                        SettingsRow(label: "Show daily traffic bar in popover") {
+                        SettingsRow(label: "Show daily traffic bar") {
                             Toggle("", isOn: $showDailyBar)
                                 .toggleStyle(.switch)
                                 .controlSize(.small)
@@ -411,7 +509,52 @@ struct GeneralSettingsTab: View {
                                 .controlSize(.small)
                                 .labelsHidden()
                         }
+                        Divider().padding(.leading, 14)
+                        SettingsRow(label: "Show ping section") {
+                            Toggle("", isOn: $showPingSection)
+                                .toggleStyle(.switch)
+                                .controlSize(.small)
+                                .labelsHidden()
+                        }
                     }
+                }
+
+                // ── Ping Metrics ──────────────────────────────────────
+                if showPingSection {
+                    SettingsSection(title: "Ping Metrics", icon: "antenna.radiowaves.left.and.right") {
+                        VStack(spacing: 0) {
+                            SettingsRow(label: "Avg latency") {
+                                Toggle("", isOn: $pingAvgLatency)
+                                    .toggleStyle(.switch).controlSize(.small).labelsHidden()
+                            }
+                            Divider().padding(.leading, 14)
+                            SettingsRow(label: "Worst latency") {
+                                Toggle("", isOn: $pingWorstLatency)
+                                    .toggleStyle(.switch).controlSize(.small).labelsHidden()
+                            }
+                            Divider().padding(.leading, 14)
+                            SettingsRow(label: "Latest latency") {
+                                Toggle("", isOn: $pingLatestLatency)
+                                    .toggleStyle(.switch).controlSize(.small).labelsHidden()
+                            }
+                            Divider().padding(.leading, 14)
+                            SettingsRow(label: "Avg packet loss") {
+                                Toggle("", isOn: $pingAvgLoss)
+                                    .toggleStyle(.switch).controlSize(.small).labelsHidden()
+                            }
+                            Divider().padding(.leading, 14)
+                            SettingsRow(label: "Worst packet loss") {
+                                Toggle("", isOn: $pingWorstLoss)
+                                    .toggleStyle(.switch).controlSize(.small).labelsHidden()
+                            }
+                            Divider().padding(.leading, 14)
+                            SettingsRow(label: "Latest packet loss") {
+                                Toggle("", isOn: $pingLatestLoss)
+                                    .toggleStyle(.switch).controlSize(.small).labelsHidden()
+                            }
+                        }
+                    }
+                    .transition(.opacity)
                 }
 
             }
