@@ -142,6 +142,14 @@ struct SimpleEntry: TimelineEntry {
 
 // MARK: - UI Components
 
+private func formatGB(_ value: Double) -> String {
+    if value.truncatingRemainder(dividingBy: 1) == 0 {
+        return String(format: "%.0f", value)
+    } else {
+        return String(format: "%.1f", value)
+    }
+}
+
 struct TrafficCardView: View {
     let title: String
     let iconName: String
@@ -149,16 +157,24 @@ struct TrafficCardView: View {
     let limit: Double
     let iconColor: Color
     
+    var displayUsed: Double {
+        (used * 10.0).rounded() / 10.0
+    }
+    
+    var displayLimit: Double {
+        (limit * 10.0).rounded() / 10.0
+    }
+    
+    var displayRemaining: Double {
+        max(displayLimit - displayUsed, 0.0)
+    }
+    
     var fraction: Double {
         min(used / max(limit, 1.0), 1.0)
     }
     
     var percentInt: Int {
         Int(min((used / max(limit, 1.0)) * 100, 999))
-    }
-    
-    var remaining: Double {
-        max(limit - used, 0.0)
     }
     
     var statusGradient: [Color] {
@@ -199,7 +215,7 @@ struct TrafficCardView: View {
             
             // Value Row: Used GB & Total Limit
             HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(String(format: "%.1f", used))
+                Text(formatGB(displayUsed))
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundColor(.primary)
                     .lineLimit(1)
@@ -208,7 +224,7 @@ struct TrafficCardView: View {
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .foregroundColor(.secondary)
                 Spacer(minLength: 2)
-                Text("of \(Int(limit)) GB")
+                Text("of \(formatGB(displayLimit)) GB")
                     .font(.system(size: 10, weight: .medium, design: .rounded))
                     .foregroundColor(.secondary)
                     .lineLimit(1)
@@ -236,7 +252,7 @@ struct TrafficCardView: View {
             
             // Remaining GB
             HStack {
-                Text(String(format: "%.1f GB left", remaining))
+                Text("\(formatGB(displayRemaining)) GB left")
                     .font(.system(size: 10, weight: .medium, design: .rounded))
                     .foregroundColor(.secondary.opacity(0.8))
                     .lineLimit(1)
@@ -263,6 +279,14 @@ struct SmallStatBlock: View {
     let limit: Double
     let color: Color
     
+    var displayUsed: Double {
+        (used * 10.0).rounded() / 10.0
+    }
+    
+    var displayLimit: Double {
+        (limit * 10.0).rounded() / 10.0
+    }
+    
     var fraction: Double {
         min(used / max(limit, 1.0), 1.0)
     }
@@ -277,7 +301,7 @@ struct SmallStatBlock: View {
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .foregroundColor(.secondary)
                 Spacer(minLength: 2)
-                Text("\(String(format: "%.1f", used)) / \(Int(limit)) GB")
+                Text("\(formatGB(displayUsed)) / \(formatGB(displayLimit)) GB")
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -432,9 +456,9 @@ struct TrafficWidgetEntryView: View {
                         .font(.system(.caption, design: .rounded))
                         .foregroundColor(.secondary)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        .widgetURL(URL(string: "trafficmonitor://open"))
     }
 }
 

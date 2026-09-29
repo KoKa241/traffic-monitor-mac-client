@@ -260,19 +260,21 @@ struct TrafficBar: View {
 // MARK: - SettingsView (Tabbed)
 
 struct SettingsView: View {
-    @State private var selectedTab: SettingsTab = .server
+    @State private var selectedTab: SettingsTab = .general
 
     enum SettingsTab: String, CaseIterable, Identifiable {
-        case server = "Server"
         case general = "General"
+        case server = "Server"
         case system = "System"
+        case about = "About"
         var id: Self { self }
 
         var icon: String {
             switch self {
-            case .server:  return "server.rack"
             case .general: return "slider.horizontal.3"
+            case .server:  return "server.rack"
             case .system:  return "gearshape.2"
+            case .about:   return "info.circle"
             }
         }
     }
@@ -294,14 +296,64 @@ struct SettingsView: View {
             // Tab content
             Group {
                 switch selectedTab {
-                case .server:  ServerSettingsTab()
                 case .general: GeneralSettingsTab()
+                case .server:  ServerSettingsTab()
                 case .system:  SystemSettingsTab()
+                case .about:   AboutSettingsTab()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(width: 400, height: 380)
+    }
+}
+
+// MARK: - About Tab
+
+struct AboutSettingsTab: View {
+    private var versionString: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.2.0"
+        return "Version \(version)"
+    }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Spacer()
+
+            Image(systemName: "network")
+                .font(.system(size: 44, weight: .semibold))
+                .foregroundStyle(.blue.gradient)
+
+            VStack(spacing: 4) {
+                Text("Traffic Monitor")
+                    .font(.title2.bold())
+                
+                Text(versionString)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            VStack(spacing: 8) {
+                HStack(spacing: 4) {
+                    Text("Created by")
+                        .foregroundStyle(.secondary)
+                    Link("KoKa241", destination: URL(string: "https://github.com/KoKa241")!)
+                        .font(.body.weight(.semibold))
+                }
+                .font(.callout)
+
+                Link(destination: URL(string: "https://github.com/KoKa241/traffic-monitor-mac-client")!) {
+                    Label("View Repository on GitHub", systemImage: "arrow.up.right.square")
+                        .font(.caption.weight(.medium))
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            }
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(20)
     }
 }
 
@@ -445,6 +497,7 @@ struct ServerSettingsTab: View {
 
 struct GeneralSettingsTab: View {
     @AppStorage("refreshInterval")  private var interval:         Double = 60.0
+    @AppStorage("showMenuBarIcon")  private var showMenuBarIcon:  Bool   = true
     @AppStorage("showDailyBar")     private var showDailyBar:     Bool   = true
     @AppStorage("showPercentInBar") private var showPercentInBar: Bool   = true
     @AppStorage("showPingSection")  private var showPingSection:  Bool   = true
@@ -496,6 +549,13 @@ struct GeneralSettingsTab: View {
                 // ── Display Options ──────────────────────────────────────
                 SettingsSection(title: "Display", icon: "eye") {
                     VStack(spacing: 0) {
+                        SettingsRow(label: "Show menu bar icon") {
+                            Toggle("", isOn: $showMenuBarIcon)
+                                .toggleStyle(.switch)
+                                .controlSize(.small)
+                                .labelsHidden()
+                        }
+                        Divider().padding(.leading, 14)
                         SettingsRow(label: "Show daily traffic bar") {
                             Toggle("", isOn: $showDailyBar)
                                 .toggleStyle(.switch)
