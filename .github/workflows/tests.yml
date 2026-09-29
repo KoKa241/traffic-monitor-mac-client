@@ -1,0 +1,30 @@
+name: macOS Unit Tests
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test:
+    name: Run Unit Tests
+    # Используем раннер macOS
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: 'latest-stable'
+
+    - name: Run xcodebuild test
+      run: |
+        xcodebuild test \
+          -project TrafficMonitor.xcodeproj \
+          -scheme TrafficMonitor \
+          -destination 'platform=macOS' \
+          -enableCodeCoverage YES

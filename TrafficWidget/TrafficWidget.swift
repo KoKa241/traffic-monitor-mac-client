@@ -91,17 +91,53 @@ struct Provider: TimelineProvider {
         SimpleEntry(date: Date(), data: .placeholder, error: nil)
     }
 
+    static var docsURL: URL? {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+    }
+
+    static func loadCachedData() -> WidgetTrafficData? {
+        if let docsURL = docsURL {
+            let dataURL = docsURL.appendingPathComponent("cachedTrafficData.json")
+            if let rawData = try? Data(contentsOf: dataURL),
+               let decoded = try? JSONDecoder().decode(WidgetTrafficData.self, from: rawData) {
+                return decoded
+            }
+        }
+        return nil
+    }
+    
+    static func loadServerURL() -> String {
+        if let docsURL = docsURL {
+            let urlFile = docsURL.appendingPathComponent("serverURL.txt")
+            if let urlStr = try? String(contentsOf: urlFile, encoding: .utf8) {
+                let trimmed = urlStr.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !trimmed.isEmpty { return trimmed }
+            }
+        }
+        return ""
+    }
+
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        let entry = SimpleEntry(date: Date(), data: .placeholder, error: nil)
+        let cachedData = Self.loadCachedData()
+        let entry = SimpleEntry(date: Date(), data: cachedData ?? .placeholder, error: nil)
         completion(entry)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        let sharedDefaults = UserDefaults(suiteName: "group.com.koka.TrafficMonitor")
-        let serverURLString = sharedDefaults?.string(forKey: "serverURL") ?? ""
+        let serverURLString = Self.loadServerURL()
+        let cachedEntryData = Self.loadCachedData()
         
-        guard let url = URL(string: serverURLString) else {
-            let entry = SimpleEntry(date: Date(), data: nil, error: "URL not set")
+        // Prefer cached data to avoid slow networking affecting widget updates
+        if let data = cachedEntryData {
+            let entry = SimpleEntry(date: Date(), data: data, error: nil)
+            let nextUpdate = Calendar.current.date(byAdding: .minute, value: 5, to: Date())!
+            let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
+            completion(timeline)
+            return
+        }
+
+        guard let url = URL(string: serverURLString), !serverURLString.isEmpty else {
+            let entry = SimpleEntry(date: Date(), data: nil, error: "Open App to set URL")
             let timeline = Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(3600)))
             completion(timeline)
             return
@@ -115,15 +151,22 @@ struct Provider: TimelineProvider {
             var entryError: String? = nil
             
             if error != nil {
-                entryError = "Conn Error"
+                entryData = cachedEntryData
+                entryError = cachedEntryData == nil ? "Conn Error" : nil
             } else if let data = data {
                 do {
                     entryData = try JSONDecoder().decode(WidgetTrafficData.self, from: data)
+                    // Save to own cache for future widget updates
+                    if let docsURL = Self.docsURL {
+                        try? data.write(to: docsURL.appendingPathComponent("cachedTrafficData.json"), options: .atomic)
+                    }
                 } catch {
-                    entryError = "Decode Error"
+                    entryData = cachedEntryData
+                    entryError = cachedEntryData == nil ? "Decode Error" : nil
                 }
             } else {
-                entryError = "No Data"
+                entryData = cachedEntryData
+                entryError = cachedEntryData == nil ? "No Data" : nil
             }
             
             let entry = SimpleEntry(date: Date(), data: entryData, error: entryError)
@@ -142,6 +185,14 @@ struct SimpleEntry: TimelineEntry {
 
 // MARK: - UI Components
 
+private func formatGB(_ value: Double) -> String {
+    if value.truncatingRemainder(dividingBy: 1) == 0 {
+        return String(format: "%.0f", value)
+    } else {
+        return String(format: "%.1f", value)
+    }
+}
+
 struct TrafficCardView: View {
     let title: String
     let iconName: String
@@ -149,16 +200,24 @@ struct TrafficCardView: View {
     let limit: Double
     let iconColor: Color
     
+    var displayUsed: Double {
+        (used * 10.0).rounded() / 10.0
+    }
+    
+    var displayLimit: Double {
+        (limit * 10.0).rounded() / 10.0
+    }
+    
+    var displayRemaining: Double {
+        max(displayLimit - displayUsed, 0.0)
+    }
+    
     var fraction: Double {
         min(used / max(limit, 1.0), 1.0)
     }
     
     var percentInt: Int {
         Int(min((used / max(limit, 1.0)) * 100, 999))
-    }
-    
-    var remaining: Double {
-        max(limit - used, 0.0)
     }
     
     var statusGradient: [Color] {
@@ -199,7 +258,7 @@ struct TrafficCardView: View {
             
             // Value Row: Used GB & Total Limit
             HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(String(format: "%.1f", used))
+                Text(formatGB(displayUsed))
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundColor(.primary)
                     .lineLimit(1)
@@ -208,7 +267,7 @@ struct TrafficCardView: View {
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .foregroundColor(.secondary)
                 Spacer(minLength: 2)
-                Text("of \(Int(limit)) GB")
+                Text("of \(formatGB(displayLimit)) GB")
                     .font(.system(size: 10, weight: .medium, design: .rounded))
                     .foregroundColor(.secondary)
                     .lineLimit(1)
@@ -236,7 +295,7 @@ struct TrafficCardView: View {
             
             // Remaining GB
             HStack {
-                Text(String(format: "%.1f GB left", remaining))
+                Text("\(formatGB(displayRemaining)) GB left")
                     .font(.system(size: 10, weight: .medium, design: .rounded))
                     .foregroundColor(.secondary.opacity(0.8))
                     .lineLimit(1)
@@ -263,6 +322,14 @@ struct SmallStatBlock: View {
     let limit: Double
     let color: Color
     
+    var displayUsed: Double {
+        (used * 10.0).rounded() / 10.0
+    }
+    
+    var displayLimit: Double {
+        (limit * 10.0).rounded() / 10.0
+    }
+    
     var fraction: Double {
         min(used / max(limit, 1.0), 1.0)
     }
@@ -277,7 +344,7 @@ struct SmallStatBlock: View {
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .foregroundColor(.secondary)
                 Spacer(minLength: 2)
-                Text("\(String(format: "%.1f", used)) / \(Int(limit)) GB")
+                Text("\(formatGB(displayUsed)) / \(formatGB(displayLimit)) GB")
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -432,9 +499,9 @@ struct TrafficWidgetEntryView: View {
                         .font(.system(.caption, design: .rounded))
                         .foregroundColor(.secondary)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        .widgetURL(URL(string: "trafficmonitor://open"))
     }
 }
 

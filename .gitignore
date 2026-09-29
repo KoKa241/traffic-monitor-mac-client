@@ -7,6 +7,7 @@ Icon?
 
 # Xcode
 build/
+build_debug/
 DerivedData/
 *.pbxuser
 !default.pbxuser
@@ -33,6 +34,7 @@ xcuserdata/
 Packages/
 Package.resolved
 *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+TrafficMonitor.app.zip
 
 # Archives
 *.xcarchive

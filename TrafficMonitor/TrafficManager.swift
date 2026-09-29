@@ -83,10 +83,12 @@ final class TrafficManager: ObservableObject {
     @Published var serverURL: String {
         didSet { 
             UserDefaults.standard.set(serverURL, forKey: "serverURL") 
-            if let sharedDefaults = UserDefaults(suiteName: "group.com.koka.TrafficMonitor") {
-                sharedDefaults.set(serverURL, forKey: "serverURL")
-                WidgetCenter.shared.reloadAllTimelines()
-            }
+            let widgetDocs = widgetDataDirectory
+            try? FileManager.default.createDirectory(at: widgetDocs, withIntermediateDirectories: true)
+            try? serverURL.write(to: widgetDocs.appendingPathComponent("serverURL.txt"), atomically: true, encoding: .utf8)
+            
+            WidgetCenter.shared.reloadAllTimelines()
+            fetchData()
         }
     }
 
@@ -98,9 +100,10 @@ final class TrafficManager: ObservableObject {
         let saved = UserDefaults.standard.string(forKey: "serverURL") ?? ""
         serverURL = saved.isEmpty ? "" : saved
 
-        if let sharedDefaults = UserDefaults(suiteName: "group.com.koka.TrafficMonitor") {
-            sharedDefaults.set(serverURL, forKey: "serverURL")
-        }
+        // Also save to widget container on launch
+        let widgetDocs = widgetDataDirectory
+        try? FileManager.default.createDirectory(at: widgetDocs, withIntermediateDirectories: true)
+        try? serverURL.write(to: widgetDocs.appendingPathComponent("serverURL.txt"), atomically: true, encoding: .utf8)
 
         fetchData()
         setupTimer()
@@ -164,6 +167,10 @@ final class TrafficManager: ObservableObject {
                     let formatter = DateFormatter()
                     formatter.timeStyle = .medium
                     self.lastUpdated = "Updated: \(formatter.string(from: Date()))"
+                    let widgetDocs = self.widgetDataDirectory
+                    try? FileManager.default.createDirectory(at: widgetDocs, withIntermediateDirectories: true)
+                    try? data.write(to: widgetDocs.appendingPathComponent("cachedTrafficData.json"), options: .atomic)
+                    
                     WidgetCenter.shared.reloadAllTimelines()
                 } catch {
                     print("TrafficMonitor decode error: \(error)")
@@ -173,4 +180,9 @@ final class TrafficManager: ObservableObject {
         }.resume()
     }
 
+    // MARK: - Helpers
+    
+    private var widgetDataDirectory: URL {
+        FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Containers/com.koka.TrafficMonitor.Widget/Data/Documents")
+    }
 }

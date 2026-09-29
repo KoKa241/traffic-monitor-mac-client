@@ -15,6 +15,13 @@ xcodebuild \
   CODE_SIGNING_ALLOWED=NO
 
 APP_PATH="$(dirname "$0")/build/Build/Products/Release/TrafficMonitor.app"
+WIDGET_PATH="$APP_PATH/Contents/PlugIns/TrafficWidgetExtension.appex"
+
+echo "🔐 Signing widget and app with entitlements..."
+codesign --force --sign - --entitlements "$(dirname "$0")/TrafficWidget/TrafficWidget.entitlements" "$WIDGET_PATH"
+codesign --force --sign - --entitlements "$(dirname "$0")/TrafficMonitor/TrafficMonitor.entitlements" "$APP_PATH"
+
+touch "$APP_PATH"
 
 echo ""
 echo "✅ Done! App is at:"

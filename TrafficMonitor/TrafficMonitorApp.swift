@@ -6,9 +6,18 @@ struct TrafficMonitorApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        // Используем нативный Settings сцену для macOS 13+
         Settings {
             SettingsView()
+                .onOpenURL { _ in
+                    appDelegate.openSettingsWindow()
+                }
+        }
+        .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button("About Traffic Monitor") {
+                    appDelegate.showAboutPanel()
+                }
+            }
         }
     }
 }
@@ -22,6 +31,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var onboardingWindow: NSWindow?
 
     private var cancellables = Set<AnyCancellable>()
+    private var isFinishedLaunching = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // 1. Элемент статус-бара
@@ -74,11 +84,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self.showOnboarding()
             }
         }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.isFinishedLaunching = true
+        }
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        guard isFinishedLaunching else { return false }
+        openSettingsWindow()
+        return true
+    }
+
+    func application(_ application: NSApplication, open urls: [URL]) {
+        openSettingsWindow()
     }
 
     // MARK: - Status Bar
 
     private func updateStatusBarTitle(data: TrafficData?) {
+        let showIcon = UserDefaults.standard.object(forKey: "showMenuBarIcon") as? Bool ?? true
+        statusItem?.isVisible = showIcon
+
+        if !showIcon {
+            showDockIcon()
+            return
+        }
+
         guard let data else {
             statusItem?.button?.title = " …"
             return
@@ -102,6 +134,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func hideDockIconIfNoWindows() {
+        let showIcon = UserDefaults.standard.object(forKey: "showMenuBarIcon") as? Bool ?? true
+        if !showIcon {
+            showDockIcon()
+            return
+        }
         let hasVisible = (onboardingWindow?.isVisible == true) || (settingsWindow?.isVisible == true)
         if !hasVisible {
             // Small delay lets the closing animation finish before removing from Dock
@@ -194,6 +231,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         showDockIcon()
         settingsWindow?.makeKeyAndOrderFront(nil)
+        if #available(macOS 14.0, *) {
+            NSApp.activate()
+        } else {
+            NSApp.activate(ignoringOtherApps: true)
+        }
+    }
+
+    // MARK: - About
+
+    @objc func showAboutPanel() {
+        let creditsText = "Created by KoKa241\nhttps://github.com/KoKa241"
+        let credits = NSMutableAttributedString(string: creditsText)
+        if let range = creditsText.range(of: "https://github.com/KoKa241") {
+            let nsRange = NSRange(range, in: creditsText)
+            credits.addAttribute(.link, value: "https://github.com/KoKa241", range: nsRange)
+        }
+
+        let options: [NSApplication.AboutPanelOptionKey: Any] = [
+            .credits: credits,
+            .applicationName: "Traffic Monitor"
+        ]
+
+        showDockIcon()
+        NSApp.orderFrontStandardAboutPanel(options: options)
         if #available(macOS 14.0, *) {
             NSApp.activate()
         } else {
