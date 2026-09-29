@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import WidgetKit
 
 // MARK: - Data Models
 
@@ -80,7 +81,13 @@ final class TrafficManager: ObservableObject {
     @Published var errorMessage: String?
     // Настройки, хранящиеся в UserDefaults
     @Published var serverURL: String {
-        didSet { UserDefaults.standard.set(serverURL, forKey: "serverURL") }
+        didSet { 
+            UserDefaults.standard.set(serverURL, forKey: "serverURL") 
+            if let sharedDefaults = UserDefaults(suiteName: "group.com.koka.TrafficMonitor") {
+                sharedDefaults.set(serverURL, forKey: "serverURL")
+                WidgetCenter.shared.reloadAllTimelines()
+            }
+        }
     }
 
     private var timer: Timer?
@@ -90,6 +97,10 @@ final class TrafficManager: ObservableObject {
     private init() {
         let saved = UserDefaults.standard.string(forKey: "serverURL") ?? ""
         serverURL = saved.isEmpty ? "" : saved
+
+        if let sharedDefaults = UserDefaults(suiteName: "group.com.koka.TrafficMonitor") {
+            sharedDefaults.set(serverURL, forKey: "serverURL")
+        }
 
         fetchData()
         setupTimer()
@@ -153,6 +164,7 @@ final class TrafficManager: ObservableObject {
                     let formatter = DateFormatter()
                     formatter.timeStyle = .medium
                     self.lastUpdated = "Updated: \(formatter.string(from: Date()))"
+                    WidgetCenter.shared.reloadAllTimelines()
                 } catch {
                     print("TrafficMonitor decode error: \(error)")
                     self.errorMessage = "Format Error"

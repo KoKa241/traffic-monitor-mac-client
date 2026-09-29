@@ -3,10 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F5B7FCB8306C6D7E0022DDC5 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B7FCB7306C6D7E0022DDC5 /* WidgetKit.framework */; };
+		F5B7FCBA306C6D7E0022DDC5 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B7FCB9306C6D7E0022DDC5 /* SwiftUI.framework */; };
+		F5B7FCC6306C6D7F0022DDC5 /* TrafficWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F5B7FCB5306C6D7E0022DDC5 /* TrafficWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F5BC9B692EDB44F800FCD47E /* TrafficMonitorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BC9B682EDB44F800FCD47E /* TrafficMonitorApp.swift */; };
 		F5BC9B6B2EDB44F800FCD47E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BC9B6A2EDB44F800FCD47E /* ContentView.swift */; };
 		F5BC9B6D2EDB44F900FCD47E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5BC9B6C2EDB44F900FCD47E /* Assets.xcassets */; };
@@ -15,7 +18,34 @@
 		F5BC9B7B2EDB460000FCD47E /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BC9B7A2EDB460000FCD47E /* OnboardingView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		F5B7FCC4306C6D7F0022DDC5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F5BC9B5D2EDB44F800FCD47E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F5B7FCB4306C6D7E0022DDC5;
+			remoteInfo = TrafficWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F5B7FCC7306C6D7F0022DDC5 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F5B7FCC6306C6D7F0022DDC5 /* TrafficWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		F5B7FCB5306C6D7E0022DDC5 /* TrafficWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TrafficWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5B7FCB7306C6D7E0022DDC5 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		F5B7FCB9306C6D7E0022DDC5 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		F5BC9B652EDB44F800FCD47E /* TrafficMonitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrafficMonitor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5BC9B682EDB44F800FCD47E /* TrafficMonitorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrafficMonitorApp.swift; sourceTree = "<group>"; };
 		F5BC9B6A2EDB44F800FCD47E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -27,7 +57,30 @@
 		F5BC9B7A2EDB460000FCD47E /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F5B7FCCA306C6D7F0022DDC5 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = F5B7FCB4306C6D7E0022DDC5 /* TrafficWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		F5B7FCBB306C6D7E0022DDC5 /* TrafficWidget */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (F5B7FCCA306C6D7F0022DDC5 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = TrafficWidget; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
+		F5B7FCB2306C6D7E0022DDC5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5B7FCBA306C6D7E0022DDC5 /* SwiftUI.framework in Frameworks */,
+				F5B7FCB8306C6D7E0022DDC5 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F5BC9B622EDB44F800FCD47E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -38,10 +91,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F5B7FCB6306C6D7E0022DDC5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F5B7FCB7306C6D7E0022DDC5 /* WidgetKit.framework */,
+				F5B7FCB9306C6D7E0022DDC5 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F5BC9B5C2EDB44F800FCD47E = {
 			isa = PBXGroup;
 			children = (
 				F5BC9B672EDB44F800FCD47E /* TrafficMonitor */,
+				F5B7FCBB306C6D7E0022DDC5 /* TrafficWidget */,
+				F5B7FCB6306C6D7E0022DDC5 /* Frameworks */,
 				F5BC9B662EDB44F800FCD47E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -50,6 +114,7 @@
 			isa = PBXGroup;
 			children = (
 				F5BC9B652EDB44F800FCD47E /* TrafficMonitor.app */,
+				F5B7FCB5306C6D7E0022DDC5 /* TrafficWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -80,6 +145,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		F5B7FCB4306C6D7E0022DDC5 /* TrafficWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F5B7FCCB306C6D7F0022DDC5 /* Build configuration list for PBXNativeTarget "TrafficWidgetExtension" */;
+			buildPhases = (
+				F5B7FCB1306C6D7E0022DDC5 /* Sources */,
+				F5B7FCB2306C6D7E0022DDC5 /* Frameworks */,
+				F5B7FCB3306C6D7E0022DDC5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				F5B7FCBB306C6D7E0022DDC5 /* TrafficWidget */,
+			);
+			name = TrafficWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = TrafficWidgetExtension;
+			productReference = F5B7FCB5306C6D7E0022DDC5 /* TrafficWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		F5BC9B642EDB44F800FCD47E /* TrafficMonitor */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F5BC9B752EDB44F900FCD47E /* Build configuration list for PBXNativeTarget "TrafficMonitor" */;
@@ -87,10 +174,12 @@
 				F5BC9B612EDB44F800FCD47E /* Sources */,
 				F5BC9B622EDB44F800FCD47E /* Frameworks */,
 				F5BC9B632EDB44F800FCD47E /* Resources */,
+				F5B7FCC7306C6D7F0022DDC5 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				F5B7FCC5306C6D7F0022DDC5 /* PBXTargetDependency */,
 			);
 			name = TrafficMonitor;
 			productName = TrafficMonitor;
@@ -104,9 +193,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastSwiftUpdateCheck = 1250;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
+					F5B7FCB4306C6D7E0022DDC5 = {
+						CreatedOnToolsVersion = 16.4;
+					};
 					F5BC9B642EDB44F800FCD47E = {
 						CreatedOnToolsVersion = 12.5;
 					};
@@ -126,11 +218,19 @@
 			projectRoot = "";
 			targets = (
 				F5BC9B642EDB44F800FCD47E /* TrafficMonitor */,
+				F5B7FCB4306C6D7E0022DDC5 /* TrafficWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		F5B7FCB3306C6D7E0022DDC5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F5BC9B632EDB44F800FCD47E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -143,6 +243,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		F5B7FCB1306C6D7E0022DDC5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F5BC9B612EDB44F800FCD47E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -156,7 +263,80 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		F5B7FCC5306C6D7F0022DDC5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F5B7FCB4306C6D7E0022DDC5 /* TrafficWidgetExtension */;
+			targetProxy = F5B7FCC4306C6D7F0022DDC5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		F5B7FCC8306C6D7F0022DDC5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = TrafficWidget/TrafficWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TrafficWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TrafficWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.koka.TrafficMonitor.TrafficWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		F5B7FCC9306C6D7F0022DDC5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = TrafficWidget/TrafficWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TrafficWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TrafficWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.koka.TrafficMonitor.TrafficWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		F5BC9B732EDB44F900FCD47E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -284,7 +464,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = TrafficMonitor/TrafficMonitor.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
@@ -299,6 +479,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.koka.TrafficMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -309,7 +490,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = TrafficMonitor/TrafficMonitor.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
@@ -324,6 +505,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.koka.TrafficMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -331,6 +513,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		F5B7FCCB306C6D7F0022DDC5 /* Build configuration list for PBXNativeTarget "TrafficWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F5B7FCC8306C6D7F0022DDC5 /* Debug */,
+				F5B7FCC9306C6D7F0022DDC5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F5BC9B602EDB44F800FCD47E /* Build configuration list for PBXProject "TrafficMonitor" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
